@@ -1,4 +1,7 @@
-namespace aspnetapp
+
+using System.ComponentModel.DataAnnotations;
+
+namespace aspnetapp.Models
 {
     public class Counter
     {

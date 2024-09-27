@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using aspnetapp.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace aspnetapp
 {
-    public partial class CounterContext : DbContext
+    public partial class DataBaseContext : DbContext
     {
-        public CounterContext()
+        public DataBaseContext()
         {
         }
         public DbSet<Counter> Counters { get; set; } = null!;
-        public CounterContext(DbContextOptions<CounterContext> options)
+        public DbSet<Product> Products { get; set; } = null!;
+        public DataBaseContext(DbContextOptions<DataBaseContext> options)
             : base(options)
         {
         }
@@ -22,7 +24,7 @@ namespace aspnetapp
             {
                 var username = "root";//Environment.GetEnvironmentVariable("MYSQL_USERNAME");
                 var password = "Lsp19920724";//Environment.GetEnvironmentVariable("MYSQL_PASSWORD");
-                var addressParts = "10.30.106.77:3306".Split(':');//"sh-cynosdbmysql-grp-5uyirrg6.sql.tencentcdb.com:21012".Split(':');//Environment.GetEnvironmentVariable("MYSQL_ADDRESS")?.Split(':');
+                var addressParts = "10.30.106.77:3306".Split(':');//"sh-cynosdbmysql-grp-5uyirrg6.sql.tencentcdb.com:21012".Split(':');//Environment.GetEnvironmentVariable("MYSQL_ADDRESS")?.Split(':');//"10.30.106.77:3306".Split(':');
                 var host = addressParts?[0];
                 var port = addressParts?[1];
                 var connstr = $"server={host};port={port};user={username};password={password};database=aspnet_demo";
@@ -32,12 +34,18 @@ namespace aspnetapp
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.UseCollation("utf8_general_ci")
-                .HasCharSet("utf8");
-            modelBuilder.Entity<Counter>().ToTable("Counters");
-            OnModelCreatingPartial(modelBuilder);
+            modelBuilder.UseCollation("utf8_general_ci").HasCharSet("utf8");
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.ApplyConfigurationsFromAssembly(this.GetType().Assembly);
         }
 
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+
+        // 这个方法用于调用存储过程
+        public List<Product> GetEmployeeDetails(string name)
+        {
+            var res = this.Set<Product>().FromSqlInterpolated($"SELECT * FROM T_Product where name ={name}").ToList();//FromSqlRaw($"SELECT * FROM T_Product", employeeId).ToList();
+            return res;
+        }
     }
 }

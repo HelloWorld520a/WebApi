@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using aspnetapp;
+using aspnetapp.Models;
 
 public class CounterRequest {
     public string action { get; set; }
@@ -21,9 +21,9 @@ namespace aspnetapp.Controllers
     [ApiController]
     public class CounterController : ControllerBase
     {
-        private readonly CounterContext _context;
+        private readonly DataBaseContext _context;
 
-        public CounterController(CounterContext context)
+        public CounterController(DataBaseContext context)
         {
             _context = context;
         }
